@@ -1,0 +1,50 @@
+[
+    {
+        "student_id": "101",
+        "name": "Rahul",
+        "age": 21,
+        "gender": "Male",
+        "course": "Python",
+        "marks": 87.0
+    },
+    {
+        "student_id": "102",
+        "name": "Priya",
+        "age": 22,
+        "gender": "Female",
+        "course": "Java",
+        "marks": 92.0
+    },
+    {
+        "student_id": "103",
+        "name": "jonny",
+        "age": 23,
+        "gender": "Other",
+        "course": "c++",
+        "marks": 68.0
+    },
+    {
+        "student_id": "100",
+        "name": "bob",
+        "age": 23,
+        "gender": "Male",
+        "course": "JS",
+        "marks": 88.0
+    },
+    {
+        "student_id": "S999",
+        "name": "Alice Smith",
+        "age": 21,
+        "gender": "Female",
+        "course": "Data Science",
+        "marks": 98.0
+    },
+    {
+        "student_id": "S998",
+        "name": "Test Toast",
+        "age": 22,
+        "gender": "Male",
+        "course": "Math",
+        "marks": 90.0
+    }
+]
