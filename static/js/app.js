@@ -41,6 +41,9 @@ async function loadDashboard() {
     await fetchStats();
     populateCourseFilter();
     renderStudentTable(students);
+    if (!editModeId) {
+        resetForm();
+    }
 }
 
 // Fetch all students
@@ -98,7 +101,14 @@ function renderStudentTable(studentsToRender) {
         return;
     }
     
-    studentsToRender.forEach(student => {
+    // Sort students by ID from least to max (ascending)
+    const sortedStudents = [...studentsToRender].sort((a, b) => {
+        const idA = parseInt(String(a.student_id).replace(/\D/g, ''), 10) || 0;
+        const idB = parseInt(String(b.student_id).replace(/\D/g, ''), 10) || 0;
+        return idA - idB;
+    });
+
+    sortedStudents.forEach(student => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><strong>${escapeHTML(student.student_id)}</strong></td>
@@ -145,10 +155,22 @@ async function handleFormSubmit(e) {
     const courseInput = document.getElementById('student-course');
     const marksInput = document.getElementById('student-marks');
     
+    const rawId = Number(idInput.value.trim());
+    if (isNaN(rawId) || !Number.isInteger(rawId) || rawId < 100 || rawId > 999) {
+        showToast('Student ID must be a whole number from 100 to 999.', 'error');
+        return;
+    }
+
+    const rawAge = Number(ageInput.value);
+    if (isNaN(rawAge) || !Number.isInteger(rawAge) || rawAge < 0 || rawAge > 100) {
+        showToast('Age must be a whole number between 0 and 100.', 'error');
+        return;
+    }
+
     const payload = {
-        student_id: idInput.value.trim(),
+        student_id: String(rawId),
         name: nameInput.value.trim(),
-        age: parseInt(ageInput.value),
+        age: rawAge,
         gender: genderInput.value,
         course: courseInput.value.trim(),
         marks: parseFloat(marksInput.value)
@@ -207,16 +229,34 @@ window.startEditStudent = function(studentId) {
     // Fill form inputs
     const idInput = document.getElementById('student-id');
     idInput.value = student.student_id;
-    idInput.disabled = true; // Cannot edit the ID
+    idInput.disabled = false; // Enabled for editing
     
     document.getElementById('student-name').value = student.name;
     document.getElementById('student-age').value = student.age;
     
     const genderSelect = document.getElementById('student-gender');
     genderSelect.value = student.gender;
-    genderSelect.disabled = true; // Gender updates not permitted per guidelines
+    genderSelect.disabled = false; // Enabled for editing
     
-    document.getElementById('student-course').value = student.course;
+    const courseSelect = document.getElementById('student-course');
+    courseSelect.value = student.course;
+    if (!courseSelect.value && student.course) {
+        let matched = false;
+        for (let opt of courseSelect.options) {
+            if (opt.value.toLowerCase().replace(/\s+/g, '') === student.course.toLowerCase().replace(/\s+/g, '')) {
+                courseSelect.value = opt.value;
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) {
+            const customOpt = document.createElement('option');
+            customOpt.value = student.course;
+            customOpt.textContent = student.course;
+            courseSelect.appendChild(customOpt);
+            courseSelect.value = student.course;
+        }
+    }
     document.getElementById('student-marks').value = student.marks;
     
     // Update headers and actions
@@ -225,6 +265,17 @@ window.startEditStudent = function(studentId) {
     formCancelBtn.style.display = 'inline-flex';
 };
 
+// Compute next available Student ID (100 to 999)
+function getNextAvailableId() {
+    const usedIds = new Set(students.map(s => parseInt(String(s.student_id).replace(/\D/g, ''), 10)).filter(id => !isNaN(id)));
+    for (let id = 100; id <= 999; id++) {
+        if (!usedIds.has(id)) {
+            return String(id);
+        }
+    }
+    return '100';
+}
+
 // Reset Form State
 function resetForm() {
     editModeId = null;
@@ -232,6 +283,7 @@ function resetForm() {
     
     const idInput = document.getElementById('student-id');
     idInput.disabled = false;
+    idInput.value = getNextAvailableId();
     
     const genderSelect = document.getElementById('student-gender');
     genderSelect.disabled = false;

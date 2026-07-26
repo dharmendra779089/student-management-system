@@ -64,7 +64,8 @@
                 <form id="student-form">
                     <div class="form-group">
                         <label for="student-id">Student ID</label>
-                        <input type="text" id="student-id" class="form-input" placeholder="e.g., S101" required>
+                        <input type="number" id="student-id" class="form-input" min="100" max="999" step="1" placeholder="e.g., 104" required>
+                        <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 0.25rem;">⚡ Pre-filled with next available ID (100-999). You can change it if needed.</small>
                     </div>
                     <div class="form-group">
                         <label for="student-name">Full Name</label>
@@ -72,7 +73,7 @@
                     </div>
                     <div class="form-group">
                         <label for="student-age">Age</label>
-                        <input type="number" id="student-age" class="form-input" min="1" placeholder="Enter age" required>
+                        <input type="number" id="student-age" class="form-input" min="0" max="100" step="1" placeholder="Enter age (0-100)" required>
                     </div>
                     <div class="form-group">
                         <label for="student-gender">Gender</label>
@@ -85,7 +86,16 @@
                     </div>
                     <div class="form-group">
                         <label for="student-course">Course</label>
-                        <input type="text" id="student-course" class="form-input" placeholder="e.g., Computer Science" required>
+                        <select id="student-course" class="form-select" required>
+                            <option value="" disabled selected>Select Course</option>
+                            <option value="Python">Python</option>
+                            <option value="Java">Java</option>
+                            <option value="C++">C++</option>
+                            <option value="JS">JS</option>
+                            <option value="DataScience">DataScience</option>
+                            <option value="Math">Math</option>
+                            <option value="Physics">Physics</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="student-marks">Marks (0-100)</label>

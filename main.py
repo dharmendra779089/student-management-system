@@ -18,24 +18,21 @@ def get_valid_name(prompt):
         # If the input was empty, print an error and let the loop repeat
         print("Error: Name cannot be empty.")
 
-# Define a function to ensure the user enters a valid, positive whole number for Age
+# Define a function to ensure the user enters a valid whole number between 0 and 100 for Age
 def get_valid_age():
-    # Start an infinite loop for validation
     while True:
-        # Start a try block to catch errors if the user types letters instead of numbers
         try:
-            # Ask for input, attempt to convert it to an integer (int), and store it in 'age'
-            age = int(input("Enter Age: "))
-            # Check if the entered integer is logically valid (greater than 0)
-            if age > 0:
-                # If valid, return the age to the main program (breaking the loop)
+            val_str = input("Enter Age (0-100): ").strip()
+            age_float = float(val_str)
+            if not age_float.is_integer():
+                print("Error: Age must be a whole number (no decimals allowed).")
+                continue
+            age = int(age_float)
+            if 0 <= age <= 100:
                 return age
-            # If the number is 0 or negative, print an error
-            print("Error: Age must be greater than 0.")
-        # Catch the specific error that happens if int() fails (e.g., user typed "twenty")
+            print("Error: Age must be a whole number between 0 and 100.")
         except ValueError:
-            # Print a friendly error message and let the loop repeat
-            print("Invalid input. Please enter a whole number.")
+            print("Invalid input. Please enter a whole number between 0 and 100.")
 
 # Define a function to ensure the user enters a valid number between 0 and 100 for Marks
 def get_valid_marks():
@@ -83,6 +80,13 @@ def get_valid_gender():
         else:
             print("Error: Invalid Gender. Please enter Male (M), Female (F), or Other (O).")
 
+def get_next_available_id(student_list):
+    used_ids = {int(s["student_id"]) for s in student_list if str(s.get("student_id", "")).isdigit()}
+    for candidate in range(100, 1000):
+        if candidate not in used_ids:
+            return str(candidate)
+    return "100"
+
 # --- Main Program Logic ---
 
 # Define the main function that drives the entire application
@@ -110,12 +114,23 @@ def main():
             # --- OPTION 1: Add Student ---
             if choice == "1":
                 print("\n--- Add Student ---")
-                # Ask for the student ID, validating that it is neither empty nor a duplicate
+                next_suggested_id = get_next_available_id(student_list)
+                # Ask for the student ID, validating numeric range 100-999 and uniqueness (defaults to next available ID)
                 while True:
-                    student_id = input("Enter Student ID: ").strip()
-                    if not student_id:
-                        print("Error: Student ID cannot be empty.")
-                        continue
+                    student_id_input = input(f"Enter Student ID (100-999) [Press Enter for default '{next_suggested_id}']: ").strip()
+                    if not student_id_input:
+                        student_id = next_suggested_id
+                    else:
+                        try:
+                            id_num = int(student_id_input)
+                            if not (100 <= id_num <= 999):
+                                print("Error: Student ID must be a whole number from 100 to 999.")
+                                continue
+                            student_id = str(id_num)
+                        except ValueError:
+                            print("Error: Student ID must be a whole number from 100 to 999.")
+                            continue
+
                     if any(student["student_id"] == student_id for student in student_list):
                         print("Error: A student with this ID already exists.")
                         continue
@@ -148,8 +163,10 @@ def main():
                     print(f"{'ID':<10} {'Name':<15} {'Course':<15} {'Marks':<10} {'Grade'}")
                     # Print a dashed line to separate the header from the data
                     print("-" * 60)
-                    # Loop through every dictionary in the student_list
-                    for student in student_list:
+                    # Sort students by ID from least to max (ascending)
+                    sorted_students = sorted(student_list, key=lambda s: int(''.join(filter(str.isdigit, str(s["student_id"]))) or 0))
+                    # Loop through every dictionary in the sorted_students list
+                    for student in sorted_students:
                         # Calculate the grade for this specific student
                         grade = get_grade(student["marks"])
                         # Print the student's data using the exact same column widths as the header
@@ -205,10 +222,31 @@ def main():
                     # Find the matching student
                     if search_id == student["student_id"]:
                         print("Enter new details below:")
-                        # Overwrite the existing dictionary values using our helper functions
-                        # Notice we do NOT update the ID, per the requirements
+                        # Allow updating Student ID (press Enter to keep current ID)
+                        while True:
+                            new_id_input = input(f"Enter new Student ID (100-999) [Press Enter to keep '{search_id}']: ").strip()
+                            if not new_id_input:
+                                new_id = search_id
+                                break
+                            try:
+                                id_num = int(new_id_input)
+                                if not (100 <= id_num <= 999):
+                                    print("Error: Student ID must be a whole number from 100 to 999.")
+                                    continue
+                                new_id = str(id_num)
+                            except ValueError:
+                                print("Error: Student ID must be a whole number from 100 to 999.")
+                                continue
+
+                            if new_id != search_id and any(s["student_id"] == new_id for s in student_list):
+                                print("Error: A student with this ID already exists.")
+                                continue
+                            break
+
+                        student["student_id"] = new_id
                         student["name"] = get_valid_name("Enter new Name: ")
                         student["age"] = get_valid_age()
+                        student["gender"] = get_valid_gender()
                         student["course"] = get_valid_name("Enter new Course: ")
                         student["marks"] = get_valid_marks()
                         
