@@ -38,24 +38,16 @@ def get_valid_age():
         except ValueError:
             print("Invalid input. Please enter a whole number between 0 and 100.")
 
-# Define a function to ensure the user enters a valid number between 0 and 100 for Marks
+# Define a function to ensure the user enters a valid percentage between 0 and 100 for Marks
 def get_valid_marks():
-    # Start an infinite loop for validation
     while True:
-        # Start a try block to catch text-to-number conversion errors
         try:
-            # Ask for input, convert to float (allows decimals like 85.5), and store it
-            marks = float(input("Enter Marks (0-100): "))
-            # Check if the number falls within the logically valid range of 0 to 100
+            marks = float(input("Enter percentage of marks (0-100%): "))
             if 0 <= marks <= 100:
-                # If valid, return the marks
                 return marks
-            # If outside the range, print an error
-            print("Error: Marks must be between 0 and 100.")
-        # Catch the error if the user types letters instead of numbers
+            print("Error: Percentage of marks must be between 0 and 100.")
         except ValueError:
-            # Print an error and repeat the loop
-            print("Invalid input. Please enter a valid number.")
+            print("Invalid input. Please enter a valid number for percentage.")
 
 # Define a simple function to calculate a letter grade based on numeric marks
 def get_grade(marks):
