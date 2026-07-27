@@ -161,6 +161,13 @@ async function handleFormSubmit(e) {
         return;
     }
 
+    const nameVal = nameInput.value.trim();
+    const nameRegex = /^[A-Za-z\s.'-]+$/;
+    if (!nameVal || /\d/.test(nameVal) || !nameRegex.test(nameVal)) {
+        showToast('Full Name must contain text/letters only (no numbers allowed).', 'error');
+        return;
+    }
+
     const rawAge = Number(ageInput.value);
     if (isNaN(rawAge) || !Number.isInteger(rawAge) || rawAge < 0 || rawAge > 100) {
         showToast('Age must be a whole number between 0 and 100.', 'error');

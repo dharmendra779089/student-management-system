@@ -5,18 +5,22 @@ from student import Student
 
 # --- Helper Functions for Validation ---
 
-# Define a function to ensure the user types something for text fields
+import re
+
+# Define a function to ensure the user enters a valid text-only name (no numbers allowed)
 def get_valid_name(prompt):
-    # Start an infinite loop that will only break when valid data is returned
     while True:
-        # Ask for input using the provided prompt, and use .strip() to remove accidental spaces at the beginning/end
         name = input(prompt).strip()
-        # Check if the name variable actually contains characters (is not empty)
-        if name:
-            # If it is valid, return the name (this automatically breaks the loop)
-            return name
-        # If the input was empty, print an error and let the loop repeat
-        print("Error: Name cannot be empty.")
+        if not name:
+            print("Error: Name cannot be empty.")
+            continue
+        if any(char.isdigit() for char in name):
+            print("Error: Name cannot contain numbers. Please enter text only.")
+            continue
+        if not re.match(r"^[A-Za-z\s.'-]+$", name):
+            print("Error: Name must contain letters and text characters only.")
+            continue
+        return name
 
 # Define a function to ensure the user enters a valid whole number between 0 and 100 for Age
 def get_valid_age():

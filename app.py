@@ -41,6 +41,16 @@ def get_next_available_id(student_list):
             return str(candidate)
     return "100"
 
+import re
+
+def is_valid_name(name):
+    if not name or not isinstance(name, str):
+        return False
+    name_clean = name.strip()
+    if any(char.isdigit() for char in name_clean):
+        return False
+    return bool(re.match(r"^[A-Za-z\s.'-]+$", name_clean))
+
 @app.route('/api/students', methods=['POST'])
 def add_student():
     data = request.json
@@ -61,6 +71,9 @@ def add_student():
     # Validate inputs
     if not name or not gender or not course:
         return jsonify({"error": "Name, Gender, and Course are required"}), 400
+
+    if not is_valid_name(name):
+        return jsonify({"error": "Full Name must contain letters and text only (no numbers allowed)"}), 400
 
     try:
         id_num = int(student_id)
@@ -129,6 +142,9 @@ def update_student(student_id):
     # Validate inputs
     if not new_student_id or not name or not course:
         return jsonify({"error": "Student ID, Name, and Course are required"}), 400
+
+    if not is_valid_name(name):
+        return jsonify({"error": "Full Name must contain letters and text only (no numbers allowed)"}), 400
 
     # Validate new student ID if changed or provided
     try:
